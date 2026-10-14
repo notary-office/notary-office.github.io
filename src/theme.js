@@ -30,6 +30,54 @@ export const flipInRtl = { transform: (t) => (t.direction === 'rtl' ? 'scaleX(-1
 // Letter-spacing breaks the joining of Arabic letters, so tracked labels drop it in RTL.
 export const tracking = (em) => (t) => (t.direction === 'rtl' ? 0 : em);
 
+// Phones: a set of small cards reads as a feed when stacked, so they merge into one card split by
+// hairlines. `phoneGroup` goes on the container (pass `false` when it already sits inside a card),
+// `phoneGroupItem` on each item. Both do nothing from `sm` up.
+export const phoneGroup = (framed = true) => (t) => ({
+  [t.breakpoints.down('sm')]: {
+    gap: 0,
+    ...(framed && {
+      border: `1px solid ${t.palette.divider}`,
+      borderRadius: '12px',
+      bgcolor: 'background.paper',
+      boxShadow: cardShadow,
+      overflow: 'hidden',
+    }),
+  },
+});
+
+export const phoneGroupItem = (t) => ({
+  [t.breakpoints.down('sm')]: {
+    border: 0,
+    borderRadius: 0,
+    boxShadow: 'none',
+    bgcolor: 'transparent',
+    '&:not(:first-of-type)': { borderTop: `1px solid ${t.palette.divider}` },
+  },
+});
+
+// Phones: a horizontal swipe row (scroll-snap, the next card peeks in) instead of a vertical stack.
+// From `sm` up the container is a plain grid; set `gridTemplateColumns` and `gap` alongside it.
+// Scrolling follows the page direction, so it starts from the right in Arabic with no extra code.
+export const swipeRow = (t) => ({
+  [t.breakpoints.down('sm')]: {
+    display: 'flex',
+    overflowX: 'auto',
+    scrollSnapType: 'x mandatory',
+    scrollbarWidth: 'none',
+    '&::-webkit-scrollbar': { display: 'none' },
+    // Bleed to the screen edges (Container gutter is 16px) and leave room for the card shadows.
+    mx: -2,
+    px: 2,
+    scrollPaddingInline: '16px',
+    mt: -1,
+    pt: 1,
+    mb: -3,
+    pb: 3,
+    '& > *': { flex: '0 0 84%', scrollSnapAlign: 'start' },
+  },
+});
+
 export function createAppTheme(direction = 'ltr') {
   const rtl = direction === 'rtl';
   const headingFont = rtl ? arabic : serif;

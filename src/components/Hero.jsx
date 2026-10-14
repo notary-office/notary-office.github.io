@@ -13,6 +13,7 @@ import NoteAltOutlinedIcon from '@mui/icons-material/NoteAltOutlined';
 import PersonPinCircleOutlinedIcon from '@mui/icons-material/PersonPinCircleOutlined';
 
 import { useLanguage } from '../i18n/context.js';
+import { phoneGroup, phoneGroupItem } from '../theme.js';
 
 // Copy lives under hero.help.items.<key> in the i18n files.
 const HELP_ITEMS = [
@@ -51,12 +52,29 @@ function HelpCard() {
 
       <Divider sx={{ my: 3 }} />
 
-      <Box component="ul" aria-labelledby="home-help-title" sx={{ listStyle: 'none', p: 0, m: 0, display: 'grid', gap: 2 }}>
+      {/* On tablets the card spans the full width, so the three items sit side by side, icon on top. */}
+      <Box
+        component="ul"
+        aria-labelledby="home-help-title"
+        sx={[{ listStyle: 'none', p: 0, m: 0, display: 'grid', gridTemplateColumns: { sm: 'repeat(3, 1fr)', md: '1fr' }, gap: 2 }, phoneGroup(false)]}
+      >
         {HELP_ITEMS.map(({ key, icon: Icon }) => (
           <Box
             component="li"
             key={key}
-            sx={{ display: 'flex', gap: 2, p: 2.5, border: 1, borderColor: 'divider', borderRadius: '12px' }}
+            sx={[
+              {
+                display: 'flex',
+                flexDirection: { sm: 'column', md: 'row' },
+                gap: 2,
+                p: { xs: 0, sm: 2.5 },
+                py: { xs: 2.5 },
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: '12px',
+              },
+              phoneGroupItem,
+            ]}
           >
             <Box
               sx={{
@@ -164,16 +182,17 @@ export default function Hero() {
             </Box>
 
             <Box
-              sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
-                gap: 2,
-                mt: 4,
-              }}
+              sx={[
+                { display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 2, mt: 4 },
+                phoneGroup(),
+              ]}
             >
               {t('hero.highlights').map(({ title, text }) => (
-                <Card key={title} sx={{ p: 2, borderRadius: '12px' }}>
-                  <Typography variant="h4" component="h3" sx={{ fontSize: '1.75rem', mb: 0.5 }}>
+                <Card
+                  key={title}
+                  sx={[{ p: 2, borderRadius: '12px', display: { xs: 'flex', sm: 'block' }, alignItems: 'baseline', gap: 2 }, phoneGroupItem]}
+                >
+                  <Typography variant="h4" component="h3" sx={{ fontSize: '1.75rem', mb: { sm: 0.5 }, minWidth: { xs: 88, sm: 0 } }}>
                     {title}
                   </Typography>
                   <Typography variant="body2" sx={{ fontSize: '0.875rem' }}>

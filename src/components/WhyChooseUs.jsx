@@ -7,7 +7,7 @@ import TaskAltRoundedIcon from '@mui/icons-material/TaskAltRounded';
 import Reveal from './Reveal.jsx';
 import SectionHeading from './SectionHeading.jsx';
 import { useLanguage } from '../i18n/context.js';
-import { cardShadow } from '../theme.js';
+import { cardShadow, phoneGroup, phoneGroupItem } from '../theme.js';
 
 const onDark = {
   text: 'rgba(255,255,255,0.78)',
@@ -52,7 +52,12 @@ function ProcessCard() {
         </Box>
       </Box>
 
-      <Box component="ol" aria-labelledby="process-title" sx={{ listStyle: 'none', p: 0, m: 0, display: 'grid', gap: 2 }}>
+      {/* On tablets the card spans the full width, so the three steps sit side by side. */}
+      <Box
+        component="ol"
+        aria-labelledby="process-title"
+        sx={{ listStyle: 'none', p: 0, m: 0, display: 'grid', gridTemplateColumns: { sm: 'repeat(3, 1fr)', md: '1fr' }, gap: 2 }}
+      >
         {t('about.process.steps').map(({ title, text }, i) => (
           <Box
             component="li"
@@ -103,12 +108,15 @@ export default function WhyChooseUs() {
               sx={{ mb: 4 }}
             />
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, gap: 2.5 }}>
+            <Box sx={[{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, gap: 2.5 }, phoneGroup()]}>
               {t('about.reasons').map(({ title, text }, i) => (
                 <Reveal
                   key={title}
                   delay={Math.min(i, 2) * 100}
-                  sx={{ p: 2.5, bgcolor: 'background.paper', border: 1, borderColor: 'divider', borderRadius: '12px' }}
+                  sx={[
+                    { p: 2.5, bgcolor: 'background.paper', border: 1, borderColor: 'divider', borderRadius: '12px' },
+                    phoneGroupItem,
+                  ]}
                 >
                   <Typography component="h3" sx={{ fontWeight: 600, color: 'text.primary', mb: 1 }}>
                     {title}

@@ -1,7 +1,6 @@
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import Container from '@mui/material/Container';
-import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
@@ -10,6 +9,7 @@ import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded
 import Reveal from './Reveal.jsx';
 import SectionHeading from './SectionHeading.jsx';
 import { useLanguage } from '../i18n/context.js';
+import { swipeRow } from '../theme.js';
 
 // Copy lives under services.items.<key> in the i18n files.
 const SERVICES = [
@@ -22,7 +22,7 @@ const ICON_COLORS = { rose: '#B23A48', green: '#2E6B4F' };
 
 function ServiceCard({ icon: Icon, tint, title, text, bullets, index }) {
   return (
-    <Card component="article" sx={{ p: 4, height: '100%' }}>
+    <Card component="article" sx={{ p: { xs: 3, sm: 4 }, height: '100%' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
         <Box
           sx={{
@@ -90,15 +90,24 @@ export default function Services() {
           align="center"
         />
 
-        <Grid container spacing={3}>
+        {/* Swipe row on phones, two per row on tablets (an odd last card takes the full row), three on desktop. */}
+        <Box
+          sx={[
+            {
+              display: 'grid',
+              gridTemplateColumns: { sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+              gap: 3,
+              '& > :last-child:nth-of-type(odd)': { gridColumn: { sm: '1 / -1', md: 'auto' } },
+            },
+            swipeRow,
+          ]}
+        >
           {SERVICES.map(({ key, ...service }, i) => (
-            <Grid key={key} size={{ xs: 12, md: 4 }}>
-              <Reveal delay={i * 100} sx={{ height: '100%' }}>
-                <ServiceCard {...service} {...t(`services.items.${key}`)} index={i} />
-              </Reveal>
-            </Grid>
+            <Reveal key={key} delay={i * 100} sx={{ height: '100%' }}>
+              <ServiceCard {...service} {...t(`services.items.${key}`)} index={i} />
+            </Reveal>
           ))}
-        </Grid>
+        </Box>
       </Container>
     </Box>
   );

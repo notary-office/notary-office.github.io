@@ -93,7 +93,7 @@ export default function Location() {
         />
 
         <Grid container spacing={3}>
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Reveal sx={{ height: '100%' }}>
               <Card sx={{ p: { xs: 3, md: 4 }, height: '100%' }}>
                 <Box component="ul" sx={{ listStyle: 'none', p: 0, m: 0, display: 'grid', gap: 3 }}>
@@ -115,7 +115,7 @@ export default function Location() {
             </Reveal>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 6 }}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Reveal delay={100} sx={{ height: '100%' }}>
               <Card sx={{ position: 'relative', height: '100%', minHeight: 360, display: 'flex' }}>
                 <Box

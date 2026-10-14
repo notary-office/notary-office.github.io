@@ -48,7 +48,7 @@ function Logo() {
       >
         <BalanceIcon sx={{ fontSize: 18 }} aria-hidden />
       </Box>
-      <Box>
+      <Box sx={{ whiteSpace: 'nowrap' }}>
         <Typography sx={{ fontFamily: (t) => t.typography.h1.fontFamily, fontSize: '1.375rem', fontWeight: 500, lineHeight: 1, color: 'primary.main' }}>
           {localize(business.name)}
         </Typography>
@@ -148,7 +148,8 @@ export default function Header() {
               size="small"
               href="#book"
               startIcon={<CalendarMonthOutlinedIcon />}
-              sx={{ display: { xs: 'none', sm: 'inline-flex' }, py: 1 }}
+              // From 600px the switcher and logo leave too little room, so the button joins them at 700px (it stays in the drawer).
+              sx={(theme) => ({ display: 'none', [theme.breakpoints.up(700)]: { display: 'inline-flex' }, py: 1, whiteSpace: 'nowrap' })}
             >
               {t('header.cta')}
             </Button>
