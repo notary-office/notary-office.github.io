@@ -17,7 +17,7 @@ import Reveal from './Reveal.jsx';
 import SectionHeading from './SectionHeading.jsx';
 import { business } from '../config/business.js';
 import { useLanguage } from '../i18n/context.js';
-import { flipInRtl } from '../theme.js';
+import { flipInRtl, swipeRow } from '../theme.js';
 
 // Darker than gold.main so the stars stay visible on white and on the warm featured card.
 const STAR_COLOR = '#D9A441';
@@ -233,7 +233,8 @@ export default function Reviews() {
           </Grid>
 
           <Grid size={{ xs: 12, md: 7 }}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' }, gap: 3 }}>
+            {/* Swipe row on phones; from sm the featured review spans the row above the others. */}
+            <Box sx={[{ display: 'grid', gridTemplateColumns: { sm: 'repeat(2, 1fr)' }, gap: 3 }, swipeRow]}>
               <Reveal delay={100} sx={{ gridColumn: '1 / -1' }}>
                 <ReviewCard {...featured} featured />
               </Reveal>
