@@ -9,9 +9,9 @@ export const business = {
     fr: "Services juridiques de confiance",
     ar: "خدمات قانونية موثوقة",
   },
-  address: "4180 Rue remada, Houmt Souk, Djerba, Tunisia",
+  address: "Houmt Souk, Djerba, Tunisia",
   mapQuery: "123 Legal Avenue, City Center, Your City",
-  phone: "+216 92 092 343",
+  phone: "+12 345  678",
   email: "notary@example.com",
   hours: {
     en: "Monday to Friday, 9:00 AM – 6:00 PM",
@@ -48,7 +48,11 @@ export const business = {
         fr: "Une aide excellente pour mes documents contractuels. Les échanges ont été rapides, les pièces requises expliquées à l’avance, et l’étude a rendu la signature simple et sereine.",
         ar: "مساعدة ممتازة في وثائق العقد. كان التواصل سريعًا، وشُرحت المتطلبات مسبقًا، وجعل المكتب عملية التوقيع سلسة ومريحة.",
       },
-      tag: { en: "Contracts support", fr: "Accompagnement pour les contrats", ar: "المساعدة في العقود" },
+      tag: {
+        en: "Contracts support",
+        fr: "Accompagnement pour les contrats",
+        ar: "المساعدة في العقود",
+      },
     },
     {
       name: "Sara L.",
@@ -59,7 +63,11 @@ export const business = {
         fr: "Nous sommes venus pour des démarches administratives et avons apprécié le respect et la rigueur de l’équipe. Tout semblait bien préparé avant notre arrivée.",
         ar: "زرنا المكتب للمساعدة في وثائق رسمية، وقدّرنا احترام الفريق ودقته في التفاصيل. بدا كل شيء مُعدًّا جيدًا قبل وصولنا.",
       },
-      tag: { en: "Appointments & preparation", fr: "Rendez-vous et préparation", ar: "المواعيد والتحضير" },
+      tag: {
+        en: "Appointments & preparation",
+        fr: "Rendez-vous et préparation",
+        ar: "المواعيد والتحضير",
+      },
     },
   ],
 };
