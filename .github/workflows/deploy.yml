@@ -28,13 +28,12 @@ jobs:
           node-version: 22
           cache: npm
 
-      - id: pages
-        uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v5
 
       - run: npm ci
 
-      # base_path is "/notary-office" for a project site, or "" with a custom domain.
-      - run: npm run build -- --base="${{ steps.pages.outputs.base_path }}/"
+      # The site is served from the domain root; base is set in vite.config.js.
+      - run: npm run build
 
       - uses: actions/upload-pages-artifact@v4
         with:
