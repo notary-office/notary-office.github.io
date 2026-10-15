@@ -12,6 +12,7 @@ import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import NoteAltOutlinedIcon from '@mui/icons-material/NoteAltOutlined';
 import PersonPinCircleOutlinedIcon from '@mui/icons-material/PersonPinCircleOutlined';
 
+import heroPen from '../assets/hero-pen.png';
 import { useLanguage } from '../i18n/context.js';
 import { phoneGroup, phoneGroupItem } from '../theme.js';
 
@@ -137,6 +138,8 @@ export default function Hero() {
       aria-labelledby="home-title"
       sx={{
         py: { xs: 8, md: 10 },
+        // Clips the pen drawing where it bleeds past the screen edge.
+        overflow: 'hidden',
         // The RTL stylis plugin does not mirror gradient positions, so the glow is moved by hand.
         backgroundImage: (th) =>
           `radial-gradient(ellipse 55% 70% at ${th.direction === 'rtl' ? '10%' : '90%'} 45%, ${th.palette.heroGlow} 0%, transparent 70%)`,
@@ -144,7 +147,29 @@ export default function Hero() {
     >
       <Container>
         <Grid container columnSpacing={7} rowSpacing={6} sx={{ alignItems: 'center' }}>
-          <Grid size={{ xs: 12, md: 6 }}>
+          {/* `isolation` keeps the pen's negative z-index inside this column: under its text and cards,
+              and under the help card it reaches toward. */}
+          <Grid size={{ xs: 12, md: 6 }} sx={{ position: 'relative', isolation: 'isolate' }}>
+            {/* Decorative fountain pen, nib down by the highlight cards. `left` is flipped to `right` by the
+                RTL cache, and the drawing is mirrored so the nib still points to the outer edge. */}
+            <Box
+              component="img"
+              src={heroPen}
+              alt=""
+              aria-hidden
+              sx={(th) => ({
+                position: 'absolute',
+                zIndex: -1,
+                pointerEvents: 'none',
+                userSelect: 'none',
+                left: { xs: '-12%', md: '-29%' },
+                bottom: { xs: '-4%', md: '-6%' },
+                width: { xs: '115%', md: '150%' },
+                maxWidth: 'none', // index.css caps images at 100%
+                opacity: th.palette.mode === 'dark' ? 0.14 : 0.22,
+                transform: th.direction === 'rtl' ? 'scaleX(-1)' : 'none',
+              })}
+            />
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
               <Box aria-hidden sx={{ width: 48, height: '1px', bgcolor: 'secondary.main', flexShrink: 0 }} />
               <Typography variant="eyebrow" component="p">
