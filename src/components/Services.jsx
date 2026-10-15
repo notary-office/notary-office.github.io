@@ -18,8 +18,6 @@ const SERVICES = [
   { key: 'land', icon: AccountBalanceOutlinedIcon, tint: 'green' },
 ];
 
-const ICON_COLORS = { rose: '#B23A48', green: '#2E6B4F' };
-
 function ServiceCard({ icon: Icon, tint, title, text, bullets, index }) {
   return (
     <Card component="article" sx={{ p: { xs: 3, sm: 4 }, height: '100%' }}>
@@ -30,7 +28,7 @@ function ServiceCard({ icon: Icon, tint, title, text, bullets, index }) {
             height: 56,
             borderRadius: '12px',
             bgcolor: `tint.${tint}`,
-            color: ICON_COLORS[tint],
+            color: `tint.${tint}Icon`,
             display: 'grid',
             placeItems: 'center',
           }}

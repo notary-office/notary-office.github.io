@@ -21,6 +21,8 @@ const en = {
     language: 'Language',
     openMenu: 'Open menu',
     closeMenu: 'Close menu',
+    darkMode: 'Switch to dark mode',
+    lightMode: 'Switch to light mode',
   },
 
   hero: {

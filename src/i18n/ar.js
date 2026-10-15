@@ -20,6 +20,8 @@ const ar = {
     language: 'اللغة',
     openMenu: 'فتح القائمة',
     closeMenu: 'إغلاق القائمة',
+    darkMode: 'التبديل إلى الوضع الداكن',
+    lightMode: 'التبديل إلى الوضع الفاتح',
   },
 
   hero: {

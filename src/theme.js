@@ -1,19 +1,46 @@
 import { createTheme } from '@mui/material/styles';
 
-const colors = {
-  navy: '#1C2B4A',
-  navyDark: '#152036',
-  copper: '#B0662E',
-  page: '#FAF8F4',
-  paper: '#FFFFFF',
-  alt: '#F5F2EC',
-  border: '#E6E1D8',
-  body: '#5B6474',
-  gold: '#E9C27B',
-  goldBg: 'rgba(233,194,123,0.10)',
-  heroGlow: '#FBF3DF',
-  tintGreen: '#EAF3EE',
-  tintRose: '#FDEEEE',
+// `ink` is the main text/brand color and `onInk` the text on top of it (contained buttons).
+// `feature` is the deep navy of the process card, which stays dark in both modes.
+const PALETTES = {
+  light: {
+    ink: '#1C2B4A',
+    inkHover: '#152036',
+    onInk: '#FFFFFF',
+    feature: '#152036',
+    copper: '#B0662E',
+    page: '#FAF8F4',
+    paper: '#FFFFFF',
+    alt: '#F5F2EC',
+    border: '#E6E1D8',
+    body: '#5B6474',
+    gold: '#E9C27B',
+    goldBg: 'rgba(233,194,123,0.10)',
+    heroGlow: '#FBF3DF',
+    tintGreen: '#EAF3EE',
+    tintRose: '#FDEEEE',
+    iconGreen: '#2E6B4F',
+    iconRose: '#B23A48',
+  },
+  dark: {
+    ink: '#EDE6D9',
+    inkHover: '#D9CFBD',
+    onInk: '#1C2B4A',
+    feature: '#22335A',
+    copper: '#D9935C',
+    page: '#0F1626',
+    paper: '#172238',
+    alt: '#131D30',
+    border: 'rgba(237,230,217,0.12)',
+    body: '#A9B2C2',
+    gold: '#E9C27B',
+    goldBg: 'rgba(233,194,123,0.10)',
+    heroGlow: 'rgba(233,194,123,0.09)',
+    tintGreen: 'rgba(124,196,160,0.14)',
+    tintRose: 'rgba(229,138,150,0.14)',
+    iconGreen: '#7CC4A0',
+    iconRose: '#E58A96',
+  },
 };
 
 const serif = '"Cormorant Garamond", Georgia, "Times New Roman", serif';
@@ -78,8 +105,9 @@ export const swipeRow = (t) => ({
   },
 });
 
-export function createAppTheme(direction = 'ltr') {
+export function createAppTheme(direction = 'ltr', mode = 'light') {
   const rtl = direction === 'rtl';
+  const colors = PALETTES[mode];
   const headingFont = rtl ? arabic : serif;
   const bodyFont = rtl ? arabic : sans;
   // Cairo needs more line height than Cormorant for its tall ascenders and dots.
@@ -88,20 +116,22 @@ export function createAppTheme(direction = 'ltr') {
     fontWeight: rtl ? 600 : 500,
     lineHeight: rtl ? 1.4 : lineHeight,
     letterSpacing: 'normal',
-    color: colors.navy,
+    color: colors.ink,
   });
 
   const base = createTheme({
     direction,
     palette: {
-      primary: { main: colors.navy, dark: colors.navyDark, contrastText: '#FFFFFF' },
+      mode,
+      primary: { main: colors.ink, dark: colors.inkHover, contrastText: colors.onInk },
       secondary: { main: colors.copper, contrastText: '#FFFFFF' },
       background: { default: colors.page, paper: colors.paper, alt: colors.alt },
-      text: { primary: colors.navy, secondary: colors.body },
+      text: { primary: colors.ink, secondary: colors.body },
       divider: colors.border,
       gold: { main: colors.gold, bg: colors.goldBg },
-      tint: { green: colors.tintGreen, rose: colors.tintRose },
+      tint: { green: colors.tintGreen, rose: colors.tintRose, greenIcon: colors.iconGreen, roseIcon: colors.iconRose },
       heroGlow: colors.heroGlow,
+      feature: colors.feature,
     },
     shape: { borderRadius: 16 },
     typography: {
@@ -162,8 +192,8 @@ export function createAppTheme(direction = 'ltr') {
           outlined: {
             backgroundColor: colors.paper,
             borderColor: colors.border,
-            color: colors.navy,
-            '&:hover': { borderColor: colors.navy, backgroundColor: colors.paper },
+            color: colors.ink,
+            '&:hover': { borderColor: colors.ink, backgroundColor: colors.paper },
           },
         },
       },

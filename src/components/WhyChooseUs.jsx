@@ -21,7 +21,7 @@ function ProcessCard() {
   return (
     <Box
       sx={{
-        bgcolor: 'primary.dark',
+        bgcolor: 'feature',
         color: 'common.white',
         borderRadius: '16px',
         boxShadow: cardShadow,
