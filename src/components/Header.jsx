@@ -16,8 +16,11 @@ import Typography from '@mui/material/Typography';
 import BalanceIcon from '@mui/icons-material/Balance';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
+import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import MenuIcon from '@mui/icons-material/Menu';
 
+import { useColorMode } from '../colorMode.js';
 import { business } from '../config/business.js';
 import { DICTIONARIES, LANGUAGES, useLanguage } from '../i18n/context.js';
 import { HEADER_HEIGHT, tracking } from '../theme.js';
@@ -110,6 +113,25 @@ function LanguageSwitcher() {
   );
 }
 
+function ColorModeToggle() {
+  const { t } = useLanguage();
+  const { mode, toggleMode } = useColorMode();
+  const dark = mode === 'dark';
+  const label = t(dark ? 'header.lightMode' : 'header.darkMode');
+
+  return (
+    <IconButton
+      aria-label={label}
+      title={label}
+      onClick={toggleMode}
+      size="small"
+      sx={{ width: 36, height: 36, border: 1, borderColor: 'divider', color: 'primary.main' }}
+    >
+      {dark ? <LightModeOutlinedIcon fontSize="small" /> : <DarkModeOutlinedIcon fontSize="small" />}
+    </IconButton>
+  );
+}
+
 export default function Header() {
   const { t } = useLanguage();
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -139,10 +161,11 @@ export default function Header() {
             ))}
           </Box>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, ml: { xs: 'auto', md: 0 } }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 }, ml: { xs: 'auto', md: 0 } }}>
             <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               <LanguageSwitcher />
             </Box>
+            <ColorModeToggle />
             <Button
               variant="contained"
               size="small"

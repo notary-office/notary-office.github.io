@@ -20,6 +20,8 @@ const fr = {
     language: 'Langue',
     openMenu: 'Ouvrir le menu',
     closeMenu: 'Fermer le menu',
+    darkMode: 'Passer en mode sombre',
+    lightMode: 'Passer en mode clair',
   },
 
   hero: {
