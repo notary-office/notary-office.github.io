@@ -6,6 +6,7 @@ import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { keyframes } from '@mui/material/styles';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import FavoriteBorderRoundedIcon from '@mui/icons-material/FavoriteBorderRounded';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
@@ -13,8 +14,19 @@ import NoteAltOutlinedIcon from '@mui/icons-material/NoteAltOutlined';
 import PersonPinCircleOutlinedIcon from '@mui/icons-material/PersonPinCircleOutlined';
 
 import heroPen from '../assets/hero-pen.png';
+import Reveal from './Reveal.jsx';
 import { useLanguage } from '../i18n/context.js';
 import { phoneGroup, phoneGroupItem } from '../theme.js';
+
+// The pen fades in after the hero content and glides toward its nib, as if it had just written.
+// Only `from` is given, so it ends on the element's own opacity and transform (mirrored in RTL).
+const penIn = {
+  ltr: keyframes({ from: { opacity: 0, transform: 'translate(32px, -20px)' } }),
+  rtl: keyframes({ from: { opacity: 0, transform: 'translate(-32px, -20px) scaleX(-1)' } }),
+};
+
+// Delay between the hero blocks as they fade up on load.
+const STAGGER = 100;
 
 // Copy lives under hero.help.items.<key> in the i18n files.
 const HELP_ITEMS = [
@@ -168,24 +180,30 @@ export default function Hero() {
                 maxWidth: 'none', // index.css caps images at 100%
                 opacity: th.palette.mode === 'dark' ? 0.14 : 0.22,
                 transform: th.direction === 'rtl' ? 'scaleX(-1)' : 'none',
+                animation: `${penIn[th.direction]} 1400ms cubic-bezier(0.22, 1, 0.36, 1) 600ms both`,
+                '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
               })}
             />
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+            <Reveal sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
               <Box aria-hidden sx={{ width: 48, height: '1px', bgcolor: 'secondary.main', flexShrink: 0 }} />
               <Typography variant="eyebrow" component="p">
                 {t('hero.eyebrow')}
               </Typography>
-            </Box>
+            </Reveal>
 
-            <Typography variant="h1" id="home-title">
-              {t('hero.title')}
-            </Typography>
+            <Reveal delay={STAGGER}>
+              <Typography variant="h1" id="home-title">
+                {t('hero.title')}
+              </Typography>
+            </Reveal>
 
-            <Typography variant="body1" sx={{ mt: 3, fontSize: { md: '1.125rem' }, maxWidth: 600 }}>
-              {t('hero.lead')}
-            </Typography>
+            <Reveal delay={STAGGER * 2}>
+              <Typography variant="body1" sx={{ mt: 3, fontSize: { md: '1.125rem' }, maxWidth: 600 }}>
+                {t('hero.lead')}
+              </Typography>
+            </Reveal>
 
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 4 }}>
+            <Reveal delay={STAGGER * 3} sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 4 }}>
               <Button
                 variant="contained"
                 size="large"
@@ -204,9 +222,10 @@ export default function Hero() {
               >
                 {t('hero.secondaryCta')}
               </Button>
-            </Box>
+            </Reveal>
 
-            <Box
+            <Reveal
+              delay={STAGGER * 4}
               sx={[
                 { display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' }, gap: 2, mt: 4 },
                 phoneGroup(),
@@ -225,11 +244,13 @@ export default function Hero() {
                   </Typography>
                 </Card>
               ))}
-            </Box>
+            </Reveal>
           </Grid>
 
           <Grid size={{ xs: 12, md: 6 }}>
-            <HelpCard />
+            <Reveal delay={STAGGER * 2}>
+              <HelpCard />
+            </Reveal>
           </Grid>
         </Grid>
       </Container>
