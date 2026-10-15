@@ -179,6 +179,8 @@ const fr = {
       phoneRequired: 'Veuillez indiquer votre numéro de téléphone.',
       phoneInvalid: 'Veuillez indiquer un numéro de téléphone valide.',
       service: 'Veuillez choisir le service souhaité.',
+      date: 'Veuillez choisir un jour de semaine à partir d’aujourd’hui.',
+      time: 'Veuillez choisir une heure entre 9 h et 18 h.',
       consent: 'Veuillez accepter d’être contacté(e) afin que l’étude puisse vous répondre.',
     },
     success: 'Demande préparée. Veuillez envoyer l’e-mail qui vient de s’ouvrir.',

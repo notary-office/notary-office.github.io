@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import dayjs from 'dayjs';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,22 +14,34 @@ import MenuItem from '@mui/material/MenuItem';
 import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
 
 import Reveal from './Reveal.jsx';
 import SectionHeading from './SectionHeading.jsx';
 import { DICTIONARIES, useLanguage } from '../i18n/context.js';
+import { PICKER_LOCALES } from '../i18n/pickers.js';
 import { submitBooking } from '../services/booking.js';
 import { flipInRtl } from '../theme.js';
 
 // Labels live under booking.serviceOptions.<value> in the i18n files.
 const SERVICE_VALUES = ['weddings', 'contracts', 'land', 'other'];
 
-const INITIAL_VALUES = { name: '', surname: '', phone: '', service: '', date: '', time: '', message: '', consent: false };
+// `date` and `time` hold dayjs objects (or null) from the pickers.
+const INITIAL_VALUES = { name: '', surname: '', phone: '', service: '', date: null, time: null, message: '', consent: false };
 
 // Order matters: the first invalid field in this list gets focus on submit.
-const VALIDATED_FIELDS = ['name', 'surname', 'phone', 'service', 'consent'];
+const VALIDATED_FIELDS = ['name', 'surname', 'phone', 'service', 'date', 'time', 'consent'];
+
+// The office is open Monday to Friday, 9:00 to 18:00 (see config/business.js), so the pickers only offer those slots.
+const isWeekend = (day) => day.day() === 0 || day.day() === 6;
+const OPENING = dayjs().hour(9).minute(0);
+const CLOSING = dayjs().hour(18).minute(0);
+const minutesOf = (time) => time.hour() * 60 + time.minute();
 
 // Returns a key under booking.errors (or ''), not a message, so errors already on screen
 // switch language along with the rest of the page.
@@ -46,6 +59,13 @@ function validateField(field, values) {
         ? ''
         : 'phoneInvalid';
     }
+    // Both are optional, but a half-typed or out-of-hours value is refused rather than silently sent.
+    case 'date':
+      return !value || (value.isValid() && !value.isBefore(dayjs(), 'day') && !isWeekend(value)) ? '' : 'date';
+    case 'time':
+      return !value || (value.isValid() && minutesOf(value) >= minutesOf(OPENING) && minutesOf(value) <= minutesOf(CLOSING))
+        ? ''
+        : 'time';
     case 'consent':
       return value ? '' : 'consent';
     default:
@@ -163,8 +183,9 @@ export default function Booking() {
         phone: values.phone.trim(),
         // The email is for the office, so the service is always named in English.
         service: DICTIONARIES.en.booking.serviceOptions[values.service],
-        date: values.date,
-        time: values.time,
+        // English, like the rest of the email: "Monday, 20 October 2026" and "14:30".
+        date: values.date ? values.date.locale('en').format('dddd, D MMMM YYYY') : '',
+        time: values.time ? values.time.format('HH:mm') : '',
         message: values.message.trim(),
         language: lang,
       });
@@ -187,193 +208,224 @@ export default function Booking() {
     ...extra,
   });
 
+  // The pickers take the same id/error/helper text as the other fields, through their textField slot.
+  // A plain <input> (not the default sectioned field) keeps the label's htmlFor and focus-on-error working,
+  // and picks up the same MuiOutlinedInput styling as the other fields.
+  const pickerProps = (field) => ({
+    enableAccessibleFieldDOMStructure: false,
+    value: values[field],
+    onChange: (value) => update(field, value),
+    slotProps: {
+      textField: {
+        id: `booking-${field}`,
+        name: field,
+        fullWidth: true,
+        error: Boolean(errors[field]),
+        helperText: errors[field] ? t(`booking.errors.${errors[field]}`) : undefined,
+      },
+      field: { clearable: true },
+    },
+  });
+
   return (
-    <Box
-      component="section"
-      id="book"
-      aria-labelledby="book-title"
-      sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.alt' }}
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale={PICKER_LOCALES[lang].adapterLocale}
+      localeText={PICKER_LOCALES[lang].localeText}
     >
-      <Container>
-        <Grid container columnSpacing={6} rowSpacing={6} sx={{ alignItems: 'flex-start' }}>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <BookingIntro />
-          </Grid>
-
-          <Grid size={{ xs: 12, md: 6 }}>
-            <Reveal delay={100}>
-              <Card
-                component="form"
-                noValidate
-                onSubmit={handleSubmit}
-                aria-label={t('booking.formLabel')}
-                sx={{ p: { xs: 3, md: 4 } }}
-              >
-                <Grid container columnSpacing={2.5} rowSpacing={2.5}>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <Field id="booking-name" label={fieldText('name', 'label')} required>
-                      <TextField
-                        {...textFieldProps('name', {
-                          required: true,
-                          autoComplete: 'given-name',
-                          placeholder: fieldText('name', 'placeholder'),
-                        })}
-                      />
-                    </Field>
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <Field id="booking-surname" label={fieldText('surname', 'label')} required>
-                      <TextField
-                        {...textFieldProps('surname', {
-                          required: true,
-                          autoComplete: 'family-name',
-                          placeholder: fieldText('surname', 'placeholder'),
-                        })}
-                      />
-                    </Field>
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <Field id="booking-phone" label={fieldText('phone', 'label')} required>
-                      <TextField
-                        {...textFieldProps('phone', {
-                          type: 'tel',
-                          required: true,
-                          autoComplete: 'tel',
-                          placeholder: fieldText('phone', 'placeholder'),
-                          // Numbers are typed LTR so "+216 …" keeps its "+" in front in Arabic. `left` is
-                          // mirrored to `right` by the RTL cache, so the text still sits on the start side.
-                          slotProps: { htmlInput: { inputMode: 'tel', dir: 'ltr' } },
-                          sx: { '& input': { textAlign: 'left' } },
-                        })}
-                      />
-                    </Field>
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <Field id="booking-service" label={fieldText('service', 'label')} required>
-                      <TextField
-                        {...textFieldProps('service', {
-                          select: true,
-                          required: true,
-                          slotProps: {
-                            select: {
-                              labelId: 'booking-service-label',
-                              displayEmpty: true,
-                              renderValue: (selected) =>
-                                selected ? (
-                                  serviceLabel(selected)
-                                ) : (
-                                  <Box component="span" sx={{ color: 'text.secondary', opacity: 0.8 }}>
-                                    {fieldText('service', 'placeholder')}
-                                  </Box>
-                                ),
-                            },
-                          },
-                        })}
-                      >
-                        {SERVICE_VALUES.map((value) => (
-                          <MenuItem key={value} value={value}>
-                            {serviceLabel(value)}
-                          </MenuItem>
-                        ))}
-                      </TextField>
-                    </Field>
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <Field id="booking-date" label={fieldText('date', 'label')}>
-                      <TextField {...textFieldProps('date', { type: 'date' })} />
-                    </Field>
-                  </Grid>
-                  <Grid size={{ xs: 12, sm: 6 }}>
-                    <Field id="booking-time" label={fieldText('time', 'label')}>
-                      <TextField {...textFieldProps('time', { type: 'time' })} />
-                    </Field>
-                  </Grid>
-                  <Grid size={12}>
-                    <Field id="booking-message" label={fieldText('message', 'label')}>
-                      <TextField
-                        {...textFieldProps('message', {
-                          multiline: true,
-                          rows: 4,
-                          placeholder: fieldText('message', 'placeholder'),
-                        })}
-                      />
-                    </Field>
-                  </Grid>
-
-                  <Grid size={12}>
-                    <FormControl error={Boolean(errors.consent)} required fullWidth>
-                      <Box
-                        sx={{
-                          px: 1.5,
-                          py: 0.5,
-                          bgcolor: 'background.paper',
-                          border: 1,
-                          borderColor: errors.consent ? 'error.main' : 'divider',
-                          borderRadius: '12px',
-                        }}
-                      >
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              id="booking-consent"
-                              name="consent"
-                              checked={values.consent}
-                              onChange={(event) => update('consent', event.target.checked)}
-                              slotProps={{
-                                input: {
-                                  'aria-required': true,
-                                  'aria-invalid': Boolean(errors.consent),
-                                  'aria-describedby': errors.consent ? 'booking-consent-helper-text' : undefined,
-                                },
-                              }}
-                            />
-                          }
-                          label={t('booking.consent')}
-                          slotProps={{ typography: { variant: 'body2', sx: { color: 'text.primary' } } }}
-                          sx={{ m: 0, width: '100%' }}
-                        />
-                      </Box>
-                      {errors.consent && (
-                        <FormHelperText id="booking-consent-helper-text">{t(`booking.errors.${errors.consent}`)}</FormHelperText>
-                      )}
-                    </FormControl>
-                  </Grid>
-
-                  <Grid size={12}>
-                    <Button
-                      type="submit"
-                      variant="contained"
-                      size="large"
-                      fullWidth
-                      disabled={submitting}
-                      startIcon={<SendRoundedIcon aria-hidden sx={flipInRtl} />}
-                      sx={{ py: 1.75 }}
-                    >
-                      {t('booking.submit')}
-                    </Button>
-                  </Grid>
-                </Grid>
-              </Card>
-            </Reveal>
-          </Grid>
-        </Grid>
-      </Container>
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={8000}
-        onClose={(_, reason) => reason !== 'clickaway' && closeSnackbar()}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      <Box
+        component="section"
+        id="book"
+        aria-labelledby="book-title"
+        sx={{ py: { xs: 8, md: 12 }, bgcolor: 'background.alt' }}
       >
-        <Alert
-          onClose={closeSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: '100%', boxShadow: '0 8px 24px rgba(28,43,74,0.18)' }}
+        <Container>
+          <Grid container columnSpacing={6} rowSpacing={6} sx={{ alignItems: 'flex-start' }}>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <BookingIntro />
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Reveal delay={100}>
+                <Card
+                  component="form"
+                  noValidate
+                  onSubmit={handleSubmit}
+                  aria-label={t('booking.formLabel')}
+                  sx={{ p: { xs: 3, md: 4 } }}
+                >
+                  <Grid container columnSpacing={2.5} rowSpacing={2.5}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Field id="booking-name" label={fieldText('name', 'label')} required>
+                        <TextField
+                          {...textFieldProps('name', {
+                            required: true,
+                            autoComplete: 'given-name',
+                            placeholder: fieldText('name', 'placeholder'),
+                          })}
+                        />
+                      </Field>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Field id="booking-surname" label={fieldText('surname', 'label')} required>
+                        <TextField
+                          {...textFieldProps('surname', {
+                            required: true,
+                            autoComplete: 'family-name',
+                            placeholder: fieldText('surname', 'placeholder'),
+                          })}
+                        />
+                      </Field>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Field id="booking-phone" label={fieldText('phone', 'label')} required>
+                        <TextField
+                          {...textFieldProps('phone', {
+                            type: 'tel',
+                            required: true,
+                            autoComplete: 'tel',
+                            placeholder: fieldText('phone', 'placeholder'),
+                            // Numbers are typed LTR so "+216 …" keeps its "+" in front in Arabic. `left` is
+                            // mirrored to `right` by the RTL cache, so the text still sits on the start side.
+                            slotProps: { htmlInput: { inputMode: 'tel', dir: 'ltr' } },
+                            sx: { '& input': { textAlign: 'left' } },
+                          })}
+                        />
+                      </Field>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Field id="booking-service" label={fieldText('service', 'label')} required>
+                        <TextField
+                          {...textFieldProps('service', {
+                            select: true,
+                            required: true,
+                            slotProps: {
+                              select: {
+                                labelId: 'booking-service-label',
+                                displayEmpty: true,
+                                renderValue: (selected) =>
+                                  selected ? (
+                                    serviceLabel(selected)
+                                  ) : (
+                                    <Box component="span" sx={{ color: 'text.secondary', opacity: 0.8 }}>
+                                      {fieldText('service', 'placeholder')}
+                                    </Box>
+                                  ),
+                              },
+                            },
+                          })}
+                        >
+                          {SERVICE_VALUES.map((value) => (
+                            <MenuItem key={value} value={value}>
+                              {serviceLabel(value)}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </Field>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Field id="booking-date" label={fieldText('date', 'label')}>
+                        <DatePicker {...pickerProps('date')} disablePast shouldDisableDate={isWeekend} />
+                      </Field>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <Field id="booking-time" label={fieldText('time', 'label')}>
+                        <TimePicker
+                          {...pickerProps('time')}
+                          minTime={OPENING}
+                          maxTime={CLOSING}
+                          timeSteps={{ minutes: 15 }}
+                          skipDisabled
+                        />
+                      </Field>
+                    </Grid>
+                    <Grid size={12}>
+                      <Field id="booking-message" label={fieldText('message', 'label')}>
+                        <TextField
+                          {...textFieldProps('message', {
+                            multiline: true,
+                            rows: 4,
+                            placeholder: fieldText('message', 'placeholder'),
+                          })}
+                        />
+                      </Field>
+                    </Grid>
+
+                    <Grid size={12}>
+                      <FormControl error={Boolean(errors.consent)} required fullWidth>
+                        <Box
+                          sx={{
+                            px: 1.5,
+                            py: 0.5,
+                            bgcolor: 'background.paper',
+                            border: 1,
+                            borderColor: errors.consent ? 'error.main' : 'divider',
+                            borderRadius: '12px',
+                          }}
+                        >
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                id="booking-consent"
+                                name="consent"
+                                checked={values.consent}
+                                onChange={(event) => update('consent', event.target.checked)}
+                                slotProps={{
+                                  input: {
+                                    'aria-required': true,
+                                    'aria-invalid': Boolean(errors.consent),
+                                    'aria-describedby': errors.consent ? 'booking-consent-helper-text' : undefined,
+                                  },
+                                }}
+                              />
+                            }
+                            label={t('booking.consent')}
+                            slotProps={{ typography: { variant: 'body2', sx: { color: 'text.primary' } } }}
+                            sx={{ m: 0, width: '100%' }}
+                          />
+                        </Box>
+                        {errors.consent && (
+                          <FormHelperText id="booking-consent-helper-text">{t(`booking.errors.${errors.consent}`)}</FormHelperText>
+                        )}
+                      </FormControl>
+                    </Grid>
+
+                    <Grid size={12}>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        size="large"
+                        fullWidth
+                        disabled={submitting}
+                        startIcon={<SendRoundedIcon aria-hidden sx={flipInRtl} />}
+                        sx={{ py: 1.75 }}
+                      >
+                        {t('booking.submit')}
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </Card>
+              </Reveal>
+            </Grid>
+          </Grid>
+        </Container>
+
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={8000}
+          onClose={(_, reason) => reason !== 'clickaway' && closeSnackbar()}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         >
-          {t(snackbar.severity === 'success' ? 'booking.success' : 'booking.failure')}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <Alert
+            onClose={closeSnackbar}
+            severity={snackbar.severity}
+            variant="filled"
+            sx={{ width: '100%', boxShadow: '0 8px 24px rgba(28,43,74,0.18)' }}
+          >
+            {t(snackbar.severity === 'success' ? 'booking.success' : 'booking.failure')}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </LocalizationProvider>
   );
 }

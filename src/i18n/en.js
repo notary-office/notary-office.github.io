@@ -180,6 +180,8 @@ const en = {
       phoneRequired: 'Please enter your phone number.',
       phoneInvalid: 'Please enter a valid phone number.',
       service: 'Please choose the service you need.',
+      date: 'Please choose a weekday from today onwards.',
+      time: 'Please choose a time between 9:00 and 18:00.',
       consent: 'Please agree to be contacted so the office can reply.',
     },
     success: 'Request prepared. Please send the email that just opened.',
