@@ -9,11 +9,11 @@ import Link from '@mui/material/Link';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
+import SvgIcon from '@mui/material/SvgIcon';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import BalanceIcon from '@mui/icons-material/Balance';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
@@ -26,6 +26,29 @@ import { DICTIONARIES, LANGUAGES, useLanguage } from '../i18n/context.js';
 import { HEADER_HEIGHT, tracking } from '../theme.js';
 
 const NAV_IDS = ['services', 'about', 'address', 'reviews', 'book'];
+
+// The fountain-pen nib from public/logo.svg, without its navy disc, so it takes the theme color.
+function PenNibIcon(props) {
+  return (
+    <SvgIcon viewBox="12 12 40 40" {...props}>
+      <g transform="translate(37 24.5) rotate(35) translate(-12 -13) scale(1.45)">
+        <rect x="8.6" y="3" width="6.8" height="2.3" rx="0.6" />
+        <path
+          fillRule="evenodd"
+          d="M8.2 6.5H15.8C16 10 18.5 11.8 18.5 14.6C18.5 17 15 19.8 12 22.5C9 19.8 5.5 17 5.5 14.6C5.5 11.8 8 10 8.2 6.5ZM10.5 13.1a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0 -3 0ZM11.65 14.9H12.35L12.1 21.3H11.9Z"
+        />
+      </g>
+      <path
+        d="M29 36.6C26.4 41.2 21.4 45.6 18.6 44.6C16.4 43.8 18.8 41 23.6 42.2C29.6 43.7 38 46.4 47.5 43.2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </SvgIcon>
+  );
+}
 
 function Logo() {
   const { localize } = useLanguage();
@@ -49,7 +72,7 @@ function Logo() {
           flexShrink: 0,
         }}
       >
-        <BalanceIcon sx={{ fontSize: 18 }} aria-hidden />
+        <PenNibIcon sx={{ fontSize: 24 }} aria-hidden />
       </Box>
       <Box sx={{ whiteSpace: 'nowrap' }}>
         <Typography sx={{ fontFamily: (t) => t.typography.h1.fontFamily, fontSize: '1.375rem', fontWeight: 500, lineHeight: 1, color: 'primary.main' }}>
