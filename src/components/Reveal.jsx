@@ -38,8 +38,8 @@ export default function Reveal({ children, delay = 0, sx, ...props }) {
         animate && {
           opacity: visible ? 1 : 0,
           // `none` once shown, so the wrapper does not keep a transform (and its stacking context).
-          transform: visible ? 'none' : 'translateY(24px)',
-          transition: `opacity 600ms ease-out ${delay}ms, transform 600ms ease-out ${delay}ms`,
+          transform: visible ? 'none' : 'translateY(14px)',
+          transition: `opacity 500ms ease-out ${delay}ms, transform 500ms ease-out ${delay}ms`,
         },
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}
